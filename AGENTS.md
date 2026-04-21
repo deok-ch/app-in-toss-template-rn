@@ -500,7 +500,3 @@ npm run test       # Jest 테스트
 - LOGIN.md => 로그인
 - PAYMENTS.md => 인앱 결제
 - PROMOTION.md => 광고
-
-## 주의사항
-
-1. granite.config.ts 의 appName과 다른 코드들의 appName이 맞는지 체크한다. (공유하기 링크 등)

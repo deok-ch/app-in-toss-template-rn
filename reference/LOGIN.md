@@ -2,10 +2,10 @@
 
 Apps in Toss에서 사용자를 식별하는 두 가지 방법을 정리한 문서.
 
-| 방법 | 대상 | 함수 | 서버 필요 |
-|---|---|---|---|
-| **토스 로그인** | 로그인한 사용자 | `appLogin()` | O |
-| **Anonymous Key** | 비로그인 사용자 | `getAnonymousKey()` | X |
+| 방법              | 대상            | 함수                | 서버 필요 |
+| ----------------- | --------------- | ------------------- | --------- |
+| **토스 로그인**   | 로그인한 사용자 | `appLogin()`        | O         |
+| **Anonymous Key** | 비로그인 사용자 | `getAnonymousKey()` | X         |
 
 ---
 
@@ -92,10 +92,10 @@ Content-Type: application/json
 { "error": "invalid_grant" }
 ```
 
-| 항목 | 유효시간 |
-|---|---|
-| accessToken | 1시간 |
-| refreshToken | 14일 |
+| 항목         | 유효시간 |
+| ------------ | -------- |
+| accessToken  | 1시간    |
+| refreshToken | 14일     |
 
 ---
 
@@ -168,15 +168,15 @@ Authorization: Bearer {accessToken}
 요청할 수 있는 scope는 콘솔에서 신청한 항목으로 제한된다.
 사용자가 동의한 항목만 실제로 반환된다.
 
-| scope | 반환 필드 | 비고 |
-|---|---|---|
-| `user_key` | `userKey` | 사용자 고유 식별자. 2026-01-02 추가 |
-| `user_name` | `name` | AES-256-GCM 암호화 |
-| `user_phone` | `phone` | AES-256-GCM 암호화 |
-| `user_birthday` | `birthday` | AES-256-GCM 암호화 |
-| `user_ci` | `ci` | AES-256-GCM 암호화 |
-| `user_gender` | `gender` | AES-256-GCM 암호화 |
-| `user_nationality` | `nationality` | AES-256-GCM 암호화 |
+| scope              | 반환 필드     | 비고                                |
+| ------------------ | ------------- | ----------------------------------- |
+| `user_key`         | `userKey`     | 사용자 고유 식별자. 2026-01-02 추가 |
+| `user_name`        | `name`        | AES-256-GCM 암호화                  |
+| `user_phone`       | `phone`       | AES-256-GCM 암호화                  |
+| `user_birthday`    | `birthday`    | AES-256-GCM 암호화                  |
+| `user_ci`          | `ci`          | AES-256-GCM 암호화                  |
+| `user_gender`      | `gender`      | AES-256-GCM 암호화                  |
+| `user_nationality` | `nationality` | AES-256-GCM 암호화                  |
 
 **이 프로젝트의 기본 scope**: `user_key` (최소) ~ `user_key user_name user_phone user_birthday` (최대)
 
@@ -260,11 +260,11 @@ Content-Type: application/json
 
 **referrer 값**
 
-| 값 | 의미 |
-|---|---|
-| `UNLINK` | 사용자가 토스 앱 설정에서 직접 연결 해제 |
-| `WITHDRAWAL_TERMS` | 사용자가 로그인 서비스 동의 철회 |
-| `WITHDRAWAL_TOSS` | 사용자가 토스 계정 삭제 |
+| 값                 | 의미                                     |
+| ------------------ | ---------------------------------------- |
+| `UNLINK`           | 사용자가 토스 앱 설정에서 직접 연결 해제 |
+| `WITHDRAWAL_TERMS` | 사용자가 로그인 서비스 동의 철회         |
+| `WITHDRAWAL_TOSS`  | 사용자가 토스 계정 삭제                  |
 
 콜백 수신 시 해당 `userKey`의 세션·토큰을 서버에서 즉시 무효화한다.
 
@@ -272,23 +272,23 @@ Content-Type: application/json
 
 ## 에러 코드
 
-| 코드 | 원인 | 대응 |
-|---|---|---|
-| `invalid_grant` | authorization code 만료 또는 중복 토큰 요청 | 앱에서 `appLogin()` 재호출 |
-| `INTERNAL_ERROR` | 서버 내부 오류 | 재시도 또는 토스 측 문의 |
-| `USER_KEY_NOT_FOUND` | 로그인 서비스에 userKey 없음 | 로그인 연결 상태 확인 |
-| `USER_NOT_FOUND` | 토스 사용자 정보 조회 불가 | 토스 계정 상태 확인 |
-| `BAD_REQUEST_RETRIEVE_CERT_RESULT_EXCEEDED_LIMIT` | 조회 횟수 초과 | 요청 빈도 조절 |
+| 코드                                              | 원인                                        | 대응                       |
+| ------------------------------------------------- | ------------------------------------------- | -------------------------- |
+| `invalid_grant`                                   | authorization code 만료 또는 중복 토큰 요청 | 앱에서 `appLogin()` 재호출 |
+| `INTERNAL_ERROR`                                  | 서버 내부 오류                              | 재시도 또는 토스 측 문의   |
+| `USER_KEY_NOT_FOUND`                              | 로그인 서비스에 userKey 없음                | 로그인 연결 상태 확인      |
+| `USER_NOT_FOUND`                                  | 토스 사용자 정보 조회 불가                  | 토스 계정 상태 확인        |
+| `BAD_REQUEST_RETRIEVE_CERT_RESULT_EXCEEDED_LIMIT` | 조회 횟수 초과                              | 요청 빈도 조절             |
 
 ---
 
 ## 환경별 동작 차이
 
-| 항목 | 샌드박스 (`referrer: 'sandbox'`) | 프로덕션 (`referrer: 'DEFAULT'`) |
-|---|---|---|
-| 앱 | Apps in Toss 샌드박스 앱 | 실제 토스 앱 |
-| 사용자 인증 | 테스트 계정 | 실제 토스 계정 |
-| 토큰 | 실제 API와 동일한 엔드포인트 사용 | 동일 |
+| 항목        | 샌드박스 (`referrer: 'sandbox'`)  | 프로덕션 (`referrer: 'DEFAULT'`) |
+| ----------- | --------------------------------- | -------------------------------- |
+| 앱          | Apps in Toss 샌드박스 앱          | 실제 토스 앱                     |
+| 사용자 인증 | 테스트 계정                       | 실제 토스 계정                   |
+| 토큰        | 실제 API와 동일한 엔드포인트 사용 | 동일                             |
 
 로컬 개발 중 인증 오류는 대부분 **토큰 만료** 또는 **샌드박스 로그인 누락**이 원인이다.
 
@@ -315,16 +315,17 @@ Content-Type: application/json
 
 ## 개요
 
-| 항목 | 내용 |
-|---|---|
-| 함수 | `getAnonymousKey()` |
-| 임포트 | `import { getAnonymousKey } from '@apps-in-toss/framework'` |
-| 최소 SDK 버전 | **2.4.5** (현재 설치: 2.4.1 → **업그레이드 필요**) |
-| 반환 값 | `{ type: 'HASH', hash: string }` \| `'INVALID_CATEGORY'` \| `'ERROR'` \| `undefined` |
-| 서버 필요 여부 | 없음 |
-| 용도 | 앱 내 사용자 데이터 관리 (Toss 서버 API 호출용 아님) |
+| 항목           | 내용                                                                                 |
+| -------------- | ------------------------------------------------------------------------------------ |
+| 함수           | `getAnonymousKey()`                                                                  |
+| 임포트         | `import { getAnonymousKey } from '@apps-in-toss/framework'`                          |
+| 최소 SDK 버전  | **2.4.5** (현재 설치: 2.4.1 → **업그레이드 필요**)                                   |
+| 반환 값        | `{ type: 'HASH', hash: string }` \| `'INVALID_CATEGORY'` \| `'ERROR'` \| `undefined` |
+| 서버 필요 여부 | 없음                                                                                 |
+| 용도           | 앱 내 사용자 데이터 관리 (Toss 서버 API 호출용 아님)                                 |
 
 > **주의**: SDK를 2.4.5 이상으로 업그레이드해야 사용 가능하다.
+>
 > ```bash
 > npm install @apps-in-toss/framework@latest
 > ```
@@ -332,22 +333,17 @@ Content-Type: application/json
 ## 함수 시그니처
 
 ```typescript
-function getAnonymousKey(): Promise<
-  | { type: 'HASH'; hash: string }
-  | 'INVALID_CATEGORY'
-  | 'ERROR'
-  | undefined
->;
+function getAnonymousKey(): Promise<{ type: 'HASH'; hash: string } | 'INVALID_CATEGORY' | 'ERROR' | undefined>;
 ```
 
 ## 반환값 상세
 
-| 반환값 | 의미 |
-|---|---|
-| `{ type: 'HASH', hash: string }` | 성공. `hash`가 사용자 식별자 |
-| `'INVALID_CATEGORY'` | 게임 카테고리 미니앱에서 호출됨 (비게임 전용) |
-| `'ERROR'` | 알 수 없는 오류 발생 |
-| `undefined` | SDK 버전이 2.4.5 미만 |
+| 반환값                           | 의미                                          |
+| -------------------------------- | --------------------------------------------- |
+| `{ type: 'HASH', hash: string }` | 성공. `hash`가 사용자 식별자                  |
+| `'INVALID_CATEGORY'`             | 게임 카테고리 미니앱에서 호출됨 (비게임 전용) |
+| `'ERROR'`                        | 알 수 없는 오류 발생                          |
+| `undefined`                      | SDK 버전이 2.4.5 미만                         |
 
 ## 특성
 
@@ -393,10 +389,7 @@ import { getAnonymousKey } from '@apps-in-toss/framework';
 // 앱 시작 시
 async function initUserIdentity() {
   const anonymousResult = await getAnonymousKey();
-  const anonymousHash =
-    anonymousResult != null && typeof anonymousResult === 'object'
-      ? anonymousResult.hash
-      : null;
+  const anonymousHash = anonymousResult != null && typeof anonymousResult === 'object' ? anonymousResult.hash : null;
 
   // anonymousHash를 로컬 임시 식별자로 사용
   // 로그인 완료 후에는 userKey로 교체
@@ -409,3 +402,7 @@ async function initUserIdentity() {
 - [ ] 반환값 4가지 케이스 모두 처리 (성공, INVALID_CATEGORY, ERROR, undefined)
 - [ ] `hash` 값을 Toss 서버 API에 전달하지 않도록 주의
 - [ ] 실제 동작 테스트는 토스 앱에서 QR 코드 스캔으로 진행
+
+## 주의사항
+
+- 현재 토스 로그인은 anonymous 로그인만 가능하다.
