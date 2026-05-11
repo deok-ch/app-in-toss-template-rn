@@ -1,5 +1,6 @@
 node_modules/
 dist/
+*.ait
 npm-debug.log
 
 .yarn/*
@@ -12,9 +13,20 @@ yarn-error.log
 !.yarn/versions
 
 .env
+.env.*
+!.env.example
 .granite
 .swc
 .DS_Store
+
+# Generated report outputs
+data/latest-report.json
+data/latest-report.md
+src/config/supabase.generated.ts
+
+# Supabase local runtime state
+supabase/.branches/
+supabase/.temp/
 
 # bkit runtime state (machine-specific)
 .bkit/

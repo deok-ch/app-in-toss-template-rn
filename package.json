@@ -1,13 +1,18 @@
 {
-  "name": "my-granite-app",
+  "name": "mullin-gime-bunseokham",
   "private": true,
   "scripts": {
     "dev": "granite dev",
     "build": "ait build",
+    "generate:supabase-config": "node scripts/generate-supabase-config.mjs",
+    "predev": "npm run generate:supabase-config",
+    "pretypecheck": "npm run generate:supabase-config",
+    "prelint": "npm run generate:supabase-config",
     "test": "jest --passWithNoTests",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "deploy": "ait deploy"
+    "deploy": "ait deploy",
+    "publish:report": "node scripts/publish-report-to-supabase.mjs"
   },
   "dependencies": {
     "@apps-in-toss/framework": "^2.4.1",

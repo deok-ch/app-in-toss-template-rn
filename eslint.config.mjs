@@ -4,7 +4,17 @@ import pluginReact from 'eslint-plugin-react';
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
-  { ignores: ['**/node_modules/**', '**/dist/**', '*.{cjs,js}'] },
+  { ignores: ['**/node_modules/**', '**/dist/**', '**/.granite/**', '*.{cjs,js}'] },
+  {
+    files: ['scripts/**/*.mjs'],
+    languageOptions: {
+      globals: {
+        console: 'readonly',
+        fetch: 'readonly',
+        process: 'readonly',
+      },
+    },
+  },
   { files: ['pages/**/*.{ts,jsx,tsx}', 'src/**/*.{ts,jsx,tsx}'] },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
