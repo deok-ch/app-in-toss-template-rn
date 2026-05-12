@@ -15,15 +15,18 @@
 ## 실행 전제
 
 - 프로젝트 루트에서 실행한다.
-- `local_scripts/supabase-report.mjs` 상단 `SUPABASE_CONFIG`에 아래 값이 들어 있어야 한다.
+- Supabase 값은 아래 둘 중 하나로 제공되어야 한다.
+  - 현재 worktree의 `.env.local`
+  - 같은 git 공용 저장소 루트의 `.env.local` (Codex 새 worktree fallback)
 
-```js
-url: 'https://YOUR_PROJECT.supabase.co',
-serviceRoleKey: 'YOUR_SERVICE_ROLE_KEY',
+```bash
+SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVICE_ROLE_KEY
 ```
 
 - Supabase에는 `reports` 테이블이 생성되어 있어야 한다.
-- 업로드 스크립트는 `local_scripts/supabase-report.mjs`를 사용한다.
+- 업로드 스크립트는 `scripts/publish-report-to-supabase.mjs`를 사용한다.
+- 스크립트는 fresh worktree에서도 `git rev-parse --git-common-dir` 기준 공용 repo 루트의 `.env.local`을 자동 탐색한다.
 
 ## 자동화 프롬프트
 
@@ -52,7 +55,7 @@ serviceRoleKey: 'YOUR_SERVICE_ROLE_KEY',
 6. 저장 후 아래 명령어로 dry-run 검증을 실행한다.
 
 ```bash
-npm run publish:report -- data/latest-report.json --dry-run
+node scripts/publish-report-to-supabase.mjs data/latest-report.json --dry-run
 ```
 
 7. dry-run이 성공하면 아래 명령어를 실행해 Supabase에 저장한다.
@@ -230,7 +233,7 @@ JSON 외 문장은 파일에 넣지 않는다.
 "date": "YYYY-MM-DD",
 "type": "daily_pre_market",
 "publishedAt": "YYYY-MM-DDT08:40:00+09:00",
-"publishedAtLabel": "오늘 08:40 업데이트(근데 현재시간으로 나타내기)",
+"publishedAtLabel": "오늘 08:40 업데이트",
 "marketTemperature": "공격 | 중립 | 보수 | 관망",
 "marketTemperatureReason": "",
 "oneLineConclusion": "",
