@@ -1,7 +1,7 @@
-import { createRoute } from '@granite-js/react-native';
+import { createRoute, IOScrollView } from '@granite-js/react-native';
 import { colors } from '@toss/tds-react-native';
 import { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { fetchTodayReport, type TodayReportResult } from 'features/report/api';
 import { ConclusionSection } from 'features/report/components/ConclusionSection';
@@ -80,7 +80,7 @@ function Page() {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
+      <IOScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
         <ReportHeader report={report} />
         <MarketTemperature report={report} />
         <ConclusionSection conclusion={report.oneLineConclusion} />
@@ -90,10 +90,10 @@ function Page() {
           <SummarySection title="미국 시장 핵심 흐름" items={report.usSummary} />
         </View>
         <RiskSection risks={report.risks} checkpoints={report.checkpoints} />
-        <FeedbackButtons feedback={report.feedback} />
+        <FeedbackButtons reportId={report.id} feedback={report.feedback} />
         <TossAdPlaceholder />
         <ReportFooter disclaimer={report.disclaimer} weekendNotice={report.weekendNotice} />
-      </ScrollView>
+      </IOScrollView>
     </View>
   );
 }

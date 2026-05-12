@@ -33,3 +33,5 @@ supabase/.temp/
 
 # Local Claude settings
 .claude/settings.local.json
+
+local_scripts/

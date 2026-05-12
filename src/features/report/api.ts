@@ -1,10 +1,15 @@
+import { Storage } from '@apps-in-toss/framework';
 import { hasSupabaseConfig, supabaseConfig } from 'config/supabase';
 
-import type { Report } from './types';
+import type { Report, ReportFeedback, ReportFeedbackChoice } from './types';
 
 interface ReportRow {
   payload: unknown;
   published_at: string;
+}
+
+interface FeedbackRow {
+  feedback: unknown;
 }
 
 export type TodayReportResult =
@@ -57,10 +62,13 @@ export async function fetchTodayReport(): Promise<TodayReportResult> {
       };
     }
 
+    const feedback = await fetchReportFeedback(report.id, report.feedback);
+
     return {
       status: 'ready',
       report: {
         ...report,
+        feedback,
         publishedAtLabel: formatKoreaPublishedAt(row.published_at),
       },
     };
@@ -69,6 +77,34 @@ export async function fetchTodayReport(): Promise<TodayReportResult> {
       status: 'error',
       message: '네트워크 상태를 확인한 뒤 다시 시도해주세요.',
     };
+  }
+}
+
+export async function submitReportFeedback(reportId: string, feedback: ReportFeedbackChoice): Promise<void> {
+  if (!hasSupabaseConfig()) {
+    throw new Error('Supabase 연결이 필요해요.');
+  }
+
+  const anonymousKey = await getAnonymousFeedbackKey();
+  const endpoint = buildReportFeedbackUpsertEndpoint();
+
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      apikey: supabaseConfig.anonKey,
+      Authorization: `Bearer ${supabaseConfig.anonKey}`,
+      'Content-Type': 'application/json',
+      Prefer: 'resolution=merge-duplicates',
+    },
+    body: JSON.stringify({
+      report_id: reportId,
+      anonymous_key: anonymousKey,
+      feedback,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`피드백 저장에 실패했어요. (${response.status})`);
   }
 }
 
@@ -82,6 +118,73 @@ function buildReportsEndpoint(date: string) {
   });
 
   return `${baseUrl}/rest/v1/reports?${query.toString()}`;
+}
+
+function buildReportFeedbackEndpoint(reportId: string) {
+  const baseUrl = supabaseConfig.url.replace(/\/$/, '');
+  const query = new URLSearchParams({
+    select: 'feedback',
+    report_id: `eq.${reportId}`,
+  });
+
+  return `${baseUrl}/rest/v1/report_feedback?${query.toString()}`;
+}
+
+function buildReportFeedbackUpsertEndpoint() {
+  const baseUrl = supabaseConfig.url.replace(/\/$/, '');
+
+  return `${baseUrl}/rest/v1/report_feedback?on_conflict=report_id,anonymous_key`;
+}
+
+async function fetchReportFeedback(reportId: string, fallback: ReportFeedback): Promise<ReportFeedback> {
+  const response = await fetch(buildReportFeedbackEndpoint(reportId), {
+    headers: {
+      apikey: supabaseConfig.anonKey,
+      Authorization: `Bearer ${supabaseConfig.anonKey}`,
+    },
+  });
+
+  if (!response.ok) {
+    return fallback;
+  }
+
+  const rows = JSON.parse(await response.text()) as FeedbackRow[];
+
+  return rows.reduce<ReportFeedback>(
+    (acc, row) => {
+      if (row.feedback === 'helpful') {
+        return { ...acc, helpful: acc.helpful + 1 };
+      }
+
+      if (row.feedback === 'unclear') {
+        return { ...acc, unclear: acc.unclear + 1 };
+      }
+
+      return acc;
+    },
+    { helpful: 0, unclear: 0 }
+  );
+}
+
+async function getAnonymousFeedbackKey() {
+  const storageKey = 'mullin-gime-bunseokham:feedback-anonymous-key';
+  const savedKey = await Storage.getItem(storageKey);
+
+  if (savedKey != null && savedKey.trim() !== '') {
+    return savedKey;
+  }
+
+  const newKey = createAnonymousKey();
+  await Storage.setItem(storageKey, newKey);
+
+  return newKey;
+}
+
+function createAnonymousKey() {
+  const randomPart = Math.random().toString(36).slice(2);
+  const timePart = Date.now().toString(36);
+
+  return `anon-${timePart}-${randomPart}`;
 }
 
 function formatKoreaPublishedAt(value: string) {

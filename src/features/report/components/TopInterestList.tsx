@@ -13,10 +13,16 @@ const countryLabel = {
   GLOBAL: '글로벌',
 } as const;
 
+const confidenceLabel = {
+  high: '확신 높음',
+  medium: '확신 보통',
+  low: '확신 낮음',
+} as const;
+
 export function TopInterestList({ items }: TopInterestListProps) {
   return (
     <View style={styles.container}>
-      <SectionTitle title="오늘 관심 TOP 3" description="관심 이유와 리스크를 같이 봅니다." />
+      <SectionTitle title="아직 살아있는 흐름 3개" description="종목 추천이 아니라, 시장이 아직 놓지 않은 방향을 봅니다." />
       <View style={styles.list}>
         {items.map((item, index) => (
           <View key={item.id} style={styles.item}>
@@ -30,9 +36,14 @@ export function TopInterestList({ items }: TopInterestListProps) {
                 <Txt typography="t5" fontWeight="bold" color={colors.grey900}>
                   {item.name}
                 </Txt>
-                <Txt typography="st12" fontWeight="bold" color={colors.blue600}>
-                  {countryLabel[item.country]} · {item.confidence}
-                </Txt>
+                <View style={styles.metaRow}>
+                  <Txt typography="st12" fontWeight="bold" color={colors.blue600}>
+                    {item.category}
+                  </Txt>
+                  <Txt typography="st12" color={colors.grey500}>
+                    {countryLabel[item.country]} · {confidenceLabel[item.confidence]}
+                  </Txt>
+                </View>
               </View>
               <Txt typography="t7" color={colors.grey700}>
                 {item.reason}
@@ -100,6 +111,9 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   itemHeader: {
+    gap: 2,
+  },
+  metaRow: {
     gap: 2,
   },
   riskBox: {

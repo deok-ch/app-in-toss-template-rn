@@ -1,30 +1,37 @@
-import { colors, Txt } from '@toss/tds-react-native';
+import { InlineAd } from '@apps-in-toss/framework';
+import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
+const REPORT_BANNER_AD_GROUP_ID = 'ait.v2.live.55dca91943d64f7f';
+
 export function TossAdPlaceholder() {
+  const [isVisible, setIsVisible] = useState(true);
+
+  if (!isVisible) {
+    return null;
+  }
+
   return (
     <View style={styles.container}>
-      <Txt typography="st12" fontWeight="bold" color={colors.grey500}>
-        TOSS AD
-      </Txt>
-      <Txt typography="t7" color={colors.grey600}>
-        토스 배너 광고 영역
-      </Txt>
+      <InlineAd
+        adGroupId={REPORT_BANNER_AD_GROUP_ID}
+        theme="auto"
+        tone="blackAndWhite"
+        variant="expanded"
+        onAdRendered={() => setIsVisible(true)}
+        onNoFill={() => setIsVisible(false)}
+        onAdFailedToRender={() => setIsVisible(false)}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 72,
+    width: '100%',
+    minHeight: 96,
     marginHorizontal: 20,
     marginVertical: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.grey200,
-    borderRadius: 8,
-    backgroundColor: colors.grey50,
-    gap: 3,
+    overflow: 'hidden',
   },
 });

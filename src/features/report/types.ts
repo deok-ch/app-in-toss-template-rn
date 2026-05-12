@@ -28,6 +28,8 @@ export interface ReportFeedback {
   unclear: number;
 }
 
+export type ReportFeedbackChoice = 'helpful' | 'unclear';
+
 export interface Report {
   id: string;
   date: string;

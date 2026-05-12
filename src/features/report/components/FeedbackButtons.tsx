@@ -2,19 +2,38 @@ import { Button, colors, Txt } from '@toss/tds-react-native';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import type { ReportFeedback } from '../types';
+import { submitReportFeedback } from '../api';
+import type { ReportFeedback, ReportFeedbackChoice } from '../types';
 
 interface FeedbackButtonsProps {
+  reportId: string;
   feedback: ReportFeedback;
 }
 
-type FeedbackChoice = 'helpful' | 'unclear';
-
-export function FeedbackButtons({ feedback }: FeedbackButtonsProps) {
-  const [choice, setChoice] = useState<FeedbackChoice | null>(null);
+export function FeedbackButtons({ reportId, feedback }: FeedbackButtonsProps) {
+  const [choice, setChoice] = useState<ReportFeedbackChoice | null>(null);
+  const [pendingChoice, setPendingChoice] = useState<ReportFeedbackChoice | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const helpfulCount = feedback.helpful + (choice === 'helpful' ? 1 : 0);
   const unclearCount = feedback.unclear + (choice === 'unclear' ? 1 : 0);
+
+  const handlePress = async (nextChoice: ReportFeedbackChoice) => {
+    const previousChoice = choice;
+
+    setChoice(nextChoice);
+    setPendingChoice(nextChoice);
+    setErrorMessage(null);
+
+    try {
+      await submitReportFeedback(reportId, nextChoice);
+    } catch {
+      setChoice(previousChoice);
+      setErrorMessage('반응을 저장하지 못했어요. 잠시 후 다시 시도해주세요.');
+    } finally {
+      setPendingChoice(null);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -31,7 +50,10 @@ export function FeedbackButtons({ feedback }: FeedbackButtonsProps) {
           size="medium"
           display="full"
           style={choice === 'helpful' ? 'fill' : 'weak'}
-          onPress={() => setChoice('helpful')}
+          disabled={pendingChoice != null}
+          onPress={() => {
+            void handlePress('helpful');
+          }}
         >
           도움됐어요 {helpfulCount}
         </Button>
@@ -40,11 +62,19 @@ export function FeedbackButtons({ feedback }: FeedbackButtonsProps) {
           display="full"
           type="light"
           style={choice === 'unclear' ? 'fill' : 'weak'}
-          onPress={() => setChoice('unclear')}
+          disabled={pendingChoice != null}
+          onPress={() => {
+            void handlePress('unclear');
+          }}
         >
           애매해요 {unclearCount}
         </Button>
       </View>
+      {errorMessage != null ? (
+        <Txt typography="st12" color={colors.red600}>
+          {errorMessage}
+        </Txt>
+      ) : null}
     </View>
   );
 }
